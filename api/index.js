@@ -8,7 +8,7 @@ const app = express();
 app.use(bodyParser.json());
 
 const PORT = process.env.PORT || 3000;
-const dataPath = path.join(__dirname, 'data', 'data.json');
+const dataPath = path.join(__dirname, '..' , 'data', 'data.json');
 /// GET METHODS:
 app.get('/getData', (req, res) => {
     const email = req.query.email; //This gets the user email. Remember to actually send this in the request.
