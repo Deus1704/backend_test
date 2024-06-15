@@ -1,14 +1,22 @@
 {
-    "users":[
-        {
-        "email": "user1@example.com",
-        "completedCount": 3,
-        "completedPDFs": [1, 2, 5]
-        },
-        {
-        "email": "user2@example.com",
-        "completedCount": 2,
-        "completedPDFs": [3, 4]
-        }
-    ]
+  "users": [
+    {
+      "email": "user1@example.com",
+      "completedCount": 4,
+      "completedPDFs": [
+        1,
+        2,
+        5,
+        12
+      ]
+    },
+    {
+      "email": "user2@example.com",
+      "completedCount": 2,
+      "completedPDFs": [
+        3,
+        4
+      ]
+    }
+  ]
 }
