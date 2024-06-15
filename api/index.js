@@ -8,48 +8,100 @@ const app = express();
 app.use(bodyParser.json());
 
 const PORT = process.env.PORT || 3000;
-const dataPath = path.join(__dirname, '..' , 'data', 'data.json');
-/// GET METHODS:
+const dataPath = path.join(__dirname, '..', 'data', 'data.json');
+
+// Temporary data path for testing write permissions
+const tmpDataPath = path.join('/tmp', 'data.json');
+
+// Function to get the correct data path based on environment
+const getDataPath = () => {
+    return process.env.NODE_ENV === 'production' ? tmpDataPath : dataPath;
+};
+
+// Initialize /tmp/data.json with existing data (if needed)
+const initializeTmpDataPath = () => {
+    if (process.env.NODE_ENV === 'production') {
+        fs.copyFile(dataPath, tmpDataPath, (err) => {
+            if (err) {
+                console.error('Error initializing tmp data file:', err);
+            } else {
+                console.log('tmp data file initialized');
+            }
+        });
+    }
+};
+
+// Call the initialization function
+initializeTmpDataPath();
+
+// GET METHODS:
+app.get('/getallData', (req, res) => {
+    fs.readFile(getDataPath(), 'utf8', (err, data) => {
+        if (err) {
+            console.error('Read file error:', err);
+            res.status(500).send('An error occurred while reading the file. Please try again later.');
+            return;
+        }
+        try {
+            data = JSON.parse(data);
+        } catch (parseErr) {
+            console.error('JSON parse error:', parseErr);
+            res.status(500).send('An error occurred while parsing the data. Please try again later.');
+            return;
+        }
+        res.status(200).json(data);
+    });
+
+});
+
 app.get('/getData', (req, res) => {
-    const email = req.query.email; //This gets the user email. Remember to actually send this in the request.
-    if (!email){
+    const email = req.query.email;
+    if (!email) {
         res.status(400).send('Email is required');
         return;
     }
-    fs.readFile(dataPath, 'utf8', (err, data) => {
+    fs.readFile(getDataPath(), 'utf8', (err, data) => {
         if (err) {
-            console.error(err);
-            res.status(500).send('An error occurred. Please try again later.');
+            console.error('Read file error:', err);
+            res.status(500).send('An error occurred while reading the file. Please try again later.');
             return;
         }
-        //Parse the data to get an array of objects
-        data = JSON.parse(data);
-        //This is where I would filter the data based on the user email
-        const user = data.users.find(user => user.email === email);
-        if (!user){
-            res.status(404).send('User not found');
+        try {
+            data = JSON.parse(data);
+        } catch (parseErr) {
+            console.error('JSON parse error:', parseErr);
+            res.status(500).send('An error occurred while parsing the data. Please try again later.');
             return;
-        }else {
+        }
+        const user = data.users.find(user => user.email === email);
+        if (!user) {
+            res.status(404).send('User not found');
+        } else {
             res.status(200).json(user);
         }
     });
 });
 
-//POST METHODS;
+// POST METHODS:
 app.post('/updateData', (req, res) => {
     const { email, pdfNumber } = req.body;
     if (!email || !pdfNumber) {
         res.status(400).send('Email and pdfNumber are required');
         return;
     }
-    fs.readFile(dataPath, 'utf8', (err, data) => {
+    fs.readFile(getDataPath(), 'utf8', (err, data) => {
         if (err) {
-            console.error(err);
-            res.status(500).send('An error occurred. Please try again later.');
+            console.error('Read file error:', err);
+            res.status(500).send('An error occurred while reading the file. Please try again later.');
             return;
         }
-        // Parse the data to get an array of objects
-        data = JSON.parse(data);
+        try {
+            data = JSON.parse(data);
+        } catch (parseErr) {
+            console.error('JSON parse error:', parseErr);
+            res.status(500).send('An error occurred while parsing the data. Please try again later.');
+            return;
+        }
 
         const user = data.users.find(user => user.email === email);
         if (user) {
@@ -70,18 +122,18 @@ app.post('/updateData', (req, res) => {
                 completedCount: 1
             });
         }
-        fs.writeFile(dataPath, JSON.stringify(data, null, 2), err => {
+
+        fs.writeFile(getDataPath(), JSON.stringify(data, null, 2), err => {
             if (err) {
-                console.error(err);
-                res.status(500).send('An error occurred. Please try again later.');
+                console.error('Write file error:', err);
+                res.status(500).send('An error occurred while writing to the file. Please try again later.');
                 return;
             }
-            res.status(200).send('Data has been updated');
+            res.status(200).send(user);
         });
     });
 });
 
-
-app.listen(PORT, () => {    
+app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
-  });
+});

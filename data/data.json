@@ -2,12 +2,13 @@
   "users": [
     {
       "email": "user1@example.com",
-      "completedCount": 4,
+      "completedCount": 5,
       "completedPDFs": [
         1,
         2,
         5,
-        12
+        12,
+        126
       ]
     },
     {
