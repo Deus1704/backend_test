@@ -4,11 +4,13 @@
   "description": "",
   "main": "api/index.js",
   "scripts": {
-    "start": "nodemon api/index.js"},
+    "start": "nodemon api/index.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.19.2",
     "nodemon": "^3.1.3"
   }

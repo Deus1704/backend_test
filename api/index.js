@@ -1,10 +1,18 @@
 const fs = require('fs');
 const path = require('path');
+const cors = require('cors');
 const express = require('express');
 const bodyParser = require('body-parser');
 
 const app = express();
 
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*'); // Allow all origins or specify your frontend's origin
+    res.header('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    next();
+  });
+  
 app.use(bodyParser.json());
 
 const PORT = process.env.PORT || 3000;
